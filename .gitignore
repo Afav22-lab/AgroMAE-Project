@@ -1,0 +1,37 @@
+# Python & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+.pytest_cache/
+
+# Ambientes virtuales
+venv/
+env/
+.env
+
+# Datasets pesados (EuroSAT 13 bandas ~2GB)
+*.zip
+*.tar.gz
+data/
+eurosat_ms/
+EuroSATallBands/
+EuroSAT/
+
+# Checkpoints y Pesos de Redes Neuronales (>100MB no van en GitHub)
+*.pth
+*.pt
+*.ckpt
+checkpoints/
+logs/
+drive/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Salidas de imágenes temporales
+outputs/
+temp/
