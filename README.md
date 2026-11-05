@@ -1,86 +1,60 @@
-# 🛰️ AgroMAE: Modelado Auto-Supervisado de Imágenes Satelitales para Uso de Suelos
+# 🌾 AgroMAE: Modelado Auto-Supervisado de Imágenes Satelitales Multiespectrales para Uso de Suelos
 
-**Proyecto de Inteligencia Artificial II**  
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Afav22-lab/AgroMAE-Project/blob/main/AgroMAE_Entrenamiento_Colab.ipynb)
+
+**Asignatura:** Inteligencia Artificial II — Universidad Industrial de Santander (UIS)  
 **Integrantes:**
-- Andrés Felipe Alfonso Viviescas
-- Andrés Felipe Higuera Grateron
+* Andrés Felipe Alfonso Viviescas
+* Andrés Felipe Higuera Grateron
 
 ---
 
-## 📌 1. Descripción del Proyecto
+## 📌 Descripción del Proyecto
 
-El monitoreo agrícola y de deforestación a gran escala exige modelos de visión artificial capaces de procesar imágenes satelitales multiespectrales (Sentinel-2, 13 bandas). Sin embargo, la adquisición de anotaciones y etiquetas manuales a nivel de píxel es costosa e inviable.
+**AgroMAE** implementa un **Masked Autoencoder (MAE)** basado en *Vision Transformers (ViT)* diseñado para procesar de forma nativa las **13 bandas espectrales** de la misión satelital **Sentinel-2** (incluyendo el Infrarrojo Cercano `NIR B08`, `Red-Edge` y `SWIR`).
 
-**AgroMAE** aborda este desafío implementando un **Masked Autoencoder (MAE)** basado en Vision Transformers (ViT) que:
-1. Oculta agresivamente el **75% de los parches** de una imagen multiespectral ($64\times 64\times 13$).
-2. Aprende de manera **auto-supervisada (sin etiquetas)** a reconstruir tanto la geometría espacial como la respuesta espectral y vegetal (infrarrojo cercano / NIR).
-3. Permite transferir el conocimiento del *Encoder* para clasificar el uso del suelo con alta precisión utilizando **únicamente el 10% de los datos etiquetados**, superando a las arquitecturas convolucionales clásicas (CNNs) entrenadas desde cero.
-
----
-
-## 👥 2. Organización del Equipo y Flujo de Trabajo
-
-Para maximizar la eficiencia y garantizar un trabajo **50/50 equitativo**:
-
-| Colaborador | Rol Principal | Responsabilidades |
-| :--- | :--- | :--- |
-| **Andrés Felipe Alfonso** | *GPU Lead & Autoencoder* | • Pre-entrenamiento de AgroMAE (cómputo pesado en GPU/Colab)<br>• CheckpointManager y persistencia en Google Drive<br>• Fine-Tuning downstream del clasificador AgroMAE<br>• Generación de mosaicos de reconstrucción multiespectral (RGB y NIR) |
-| **Andrés Felipe Higuera** | *Benchmark & Evaluación* | • Implementación y entrenamiento del Modelo A (Baseline CNN supervisada)<br>• Pipeline unificado de métricas (F1-Score Macro, Accuracy, Matriz de Confusión)<br>• Análisis comparativo de curvas de desempeño (% etiquetas vs precisión)<br>• Diapositivas e informe técnico |
-
-> **Nota sobre Dependencias:**  
-> Ambos integrantes pueden trabajar en paralelo sin bloquearse gracias al módulo `src/data/splits.py`, que fija una semilla determinista (`seed=42`) para garantizar que ambos modelos se evalúen sobre el mismo conjunto de validación y prueba.
+El proyecto se divide en dos fases:
+1. **Fase 1 (Pre-entrenamiento Auto-Supervisado):** Se divide cada imagen satelital ($64 \times 64 \times 13$) en $64$ parches de $8 \times 8$ y se oculta aleatoriamente el **75%** de ellos. El *Encoder* procesa únicamente el 25% visible ($16$ parches) y el *Decoder* ligero reconstruye las 13 bandas faltantes minimizando la pérdida **MSE** sobre los parches enmascarados.
+2. **Fase 2 (Transferencia / Clasificación con Escasez de Etiquetas):** Se descarta el *Decoder* y se acopla un cabezal clasificador al *Encoder* pre-entrenado para clasificar **10 coberturas de uso de suelo (EuroSAT)** utilizando únicamente el **10% de los datos etiquetados**, comparando contra un entrenamiento supervisado desde cero (*Scratch*).
 
 ---
 
-## 📁 3. Estructura del Repositorio
+## 🗂️ Estructura del Repositorio
 
 ```text
-AgroMAE-Project/
-├── .gitignore
-├── requirements.txt
-├── README.md
-├── src/
-│   ├── data/
-│   │   ├── dataset.py            # Carga multiespectral Sentinel-2 (13 bandas) y normalización física (/10000)
-│   │   └── splits.py              # Particiones deterministas y extracción de subsets (ej. 10% etiquetado)
-│   ├── models/
-│   │   ├── agromae.py             # Arquitectura Masked Autoencoder (ViT + Sincos 2D + Decoder ligero)
-│   │   ├── classifier.py          # Cabezal downstream sobre el Encoder pre-entrenado
-│   │   └── baseline_cnn.py        # Modelo A: CNN convolucional adaptada a 13 bandas
-│   └── utils/
-│       ├── checkpoint.py          # CheckpointManager tolerante a desconexiones de Colab
-│       ├── metrics.py             # Cálculo de Accuracy, Macro F1 y Matrices de Confusión
-│       └── plotting.py            # Generación de curvas de pérdida y mosaicos de 4 paneles en alta resolución
-└── notebooks/
-    └── 01_AgroMAE_Preentrenamiento.ipynb  # Cuaderno listo para Google Colab con aceleración GPU L4/T4
+AgroMAE/
+├── AgroMAE_Entrenamiento_Colab.ipynb   # Cuaderno principal (Pre-entrenamiento MAE + Checkpointing + Fine-Tuning)
+├── docs/
+│   └── entrega2_estructura_y_guion.md  # Estructura y guion cronometrado de sustentación (2da Entrega)
+├── requirements.txt                    # Dependencias de Python / PyTorch
+├── .gitignore                          # Exclusión de pesos pesados (.pth) y datasets (.zip / .tif)
+└── README.md                           # Documentación principal del repositorio
 ```
 
 ---
 
-## 🚀 4. Guía de Ejecución Rápida
+## ⚙️ Características Técnicas Clave
 
-### Instalación de Dependencias
-```bash
-pip install -r requirements.txt
-pip install rasterio
-```
-
-### Dataset (EuroSAT Multiespectral)
-El dataset oficial de EuroSAT (Sentinel-2, 13 bandas, 10 clases) se descarga directamente desde Zenodo:
-```bash
-wget https://zenodo.org/records/7745585/files/EuroSATallBands.zip
-unzip -q EuroSATallBands.zip -d eurosat_ms/
-```
+* **Aceleración Hardware (GPU NVIDIA L4 / Ada Lovelace):** Soporte nativo de precisión mixta `bfloat16`/`float16` (`torch.amp`), `TF32` y *FlashAttention* (`F.scaled_dot_product_attention`).
+* **Gestor de Checkpoints de Doble Nivel (`CheckpointManager`):**
+  * **Nivel Intra-Epoch:** Guardado atómico cada 200 pasos en Google Drive con bandera `epoch_completed` para reanudar sin pérdida de progreso ante desconexiones de Google Colab.
+  * **Nivel Epoch:** Registro automático del mejor modelo histórico (`checkpoint_best.pth`) incluyendo pesos, momentos de `AdamW`, `CosineAnnealingLR` y `GradScaler`.
+* **Partición Estratificada:** Separación 85% *Train* / 15% *Validation* y submuestreo estratificado del 10% mediante `StratifiedShuffleSplit`.
 
 ---
 
-## 📊 5. Rúbrica de la Segunda Entrega (Presentación Oral 10 min)
+## 🚀 Cómo Ejecutar en Google Colab Directamente desde GitHub
 
-- **Portada** (15 seg)
-- **Breve Introducción** (1 min)
-- **Objetivo / Alcance** (45 seg)
-- **Método Propuesto** (3 min)
-- **Configuración Experimental** (1 min)
-- **Resultados Preliminares** (2 min)
-- **Conclusiones y Trabajo Faltante** (1 min)
-- **Vistazo al Notebook** (1 min)
+1. Abre [Google Colab](https://colab.research.google.com/).
+2. Selecciona la pestaña **GitHub**, pega la URL de este repositorio y abre `AgroMAE_Entrenamiento_Colab.ipynb`.
+3. En **Entorno de ejecución $\rightarrow$ Cambiar tipo de entorno de ejecución**, selecciona **GPU L4** (o T4) y activa **RAM amplia**.
+4. Ejecuta todas las celdas (`Ctrl + F9`).
+
+---
+
+## 📚 Referencias
+
+1. **He, K., Chen, X., Xie, S., Li, Y., Dollár, P., & Girshick, R. (2022).** *Masked Autoencoders Are Scalable Vision Learners.* IEEE/CVF CVPR, 16000–16009.
+2. **Helber, P., Bischke, B., Dengel, A., & Borth, D. (2019).** *EuroSAT: A Novel Dataset and Deep Learning Benchmark for Land Use and Land Cover Classification.* IEEE JSTARS, 12(7), 2217–2226.
+3. **Cong, Y., et al. (2022).** *SatMAE: Pre-training Transformers for Temporal and Multi-Spectral Satellite Imagery.* NeurIPS.
+
