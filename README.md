@@ -75,13 +75,15 @@ Las visualizaciones generadas durante el proyecto permiten examinar la evolució
 
 ![Reconstrucción multiespectral](logs/reconstruccion_multiespectral_agromae.png)
 
-### Diagnóstico del modelo
-
-![Diagnóstico](logs/diagnostico_real_agromae.png)
+## 📊 Resultados experimentales
 
 ### Análisis de overfitting
 
-![Overfitting](logs/curva_overfitting_agromae.png)
+![Análisis de overfitting](logs/curva_overfitting_agromae.png)
+
+### Diagnóstico del modelo
+
+![Diagnóstico del modelo](logs/diagnostico_real_agromae.png)
 
 ## Tecnologías
 
