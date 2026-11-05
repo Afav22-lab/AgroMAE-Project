@@ -67,6 +67,7 @@ Las visualizaciones generadas durante el proyecto permiten examinar la evolució
 
 > Las rutas de las imágenes son relativas al repositorio. Coloca los PNG correspondientes en la carpeta `logs/` para que se visualicen en GitHub.
 
+
 ### Curvas de entrenamiento
 
 ![Curvas de entrenamiento](logs/curvas_historicas_reales_agromae.png)
@@ -75,16 +76,9 @@ Las visualizaciones generadas durante el proyecto permiten examinar la evolució
 
 ![Reconstrucción multiespectral](logs/reconstruccion_multiespectral_agromae.png)
 
-## 📊 Resultados experimentales
-
-### Análisis de overfitting
-
-![Análisis de overfitting](logs/curva_overfitting_agromae.png)
-
-### Diagnóstico del modelo
+### Evaluación final del modelo
 
 ![Diagnóstico del modelo](logs/diagnostico_real_agromae.png)
-
 ## Tecnologías
 
 - Python
