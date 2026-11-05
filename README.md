@@ -69,15 +69,19 @@ Las visualizaciones generadas durante el proyecto permiten examinar la evolució
 
 ### Curvas de entrenamiento
 
-![Curvas históricas de entrenamiento y validación](logs/curvas_historicas_reales_agromae.png)
+![Curvas de entrenamiento](logs/curvas_historicas_reales_agromae.png)
 
 ### Reconstrucción multiespectral
 
-![Reconstrucción multiespectral de AgroMAE](logs/reconstruccion_multiespectral_agromae.png)
+![Reconstrucción multiespectral](logs/reconstruccion_multiespectral_agromae.png)
 
 ### Diagnóstico del modelo
 
-![Diagnóstico del modelo AgroMAE](logs/diagnostico_real_agromae.png)
+![Diagnóstico](logs/diagnostico_real_agromae.png)
+
+### Análisis de overfitting
+
+![Overfitting](logs/curva_overfitting_agromae.png)
 
 ## Tecnologías
 
