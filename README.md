@@ -51,6 +51,12 @@ AgroMAE utiliza una arquitectura Encoder-Decoder basada en Transformers.
 
 El encoder aprende representaciones a partir de los parches visibles. Posteriormente, el decoder utiliza estas representaciones para reconstruir los parches ocultos.
 
+## Pipeline metodológico
+
+El siguiente pipeline representa el flujo de procesamiento de AgroMAE, desde la entrada de imágenes Sentinel-2 hasta la reconstrucción multiespectral y la evaluación del modelo.
+
+![Pipeline metodológico de AgroMAE](assets/pipeline_agromae.png)
+
 ## Metodología
 
 1. Obtención y organización del conjunto EuroSAT multiespectral.
@@ -90,7 +96,7 @@ Las visualizaciones generadas durante el proyecto permiten examinar la evolució
 - Transformers
 - Sentinel-2 / EuroSAT
 
-## Estructura sugerida del repositorio
+## Estructura 
 
 ```text
 AgroMAE/
