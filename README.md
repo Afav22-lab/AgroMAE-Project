@@ -1,4 +1,6 @@
 <div align="center">
+  <img src="assets/banner_agromae.png" width="100%">
+</div>
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/USUARIO/REPOSITORIO/blob/main/notebooks/AgroMAE_Entrenamiento_Colab.ipynb)
 
