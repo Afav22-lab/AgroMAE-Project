@@ -133,3 +133,55 @@ Se propone explorar la integración de AgroMAE con información de suelos de Col
 ## Autor
 
 Proyecto académico de aprendizaje profundo y procesamiento de imágenes multiespectrales.
+
+---
+
+# 🚀 Actualización — Tercera Entrega (Entrega Final)
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Afav22-lab/AgroMAE-Project/blob/main/AgroMAE_Entrenamiento_Colab.ipynb)
+
+En esta fase final se amplió [AgroMAE_Entrenamiento_Colab.ipynb](AgroMAE_Entrenamiento_Colab.ipynb) agregando las **Secciones 8 a 13** sin alterar el trabajo previo de la Segunda Entrega. El objetivo es evaluar integralmente las representaciones auto-supervisadas del *Encoder* frente a arquitecturas **MLP** y **CNN**, analizar la contribución física de las 13 bandas y validar el modelo sobre escenas satelitales reales de **Colombia y el resto del mundo**.
+
+## Qué se agregó en la Tercera Entrega
+
+### 1. Arquitecturas Clasificadoras Downstream (`MLP` vs. `CNN`) y Aceleración en RAM (Sección 8)
+* **Reutilización directa de checkpoints + Caché en RAM:** Carga `checkpoint_best.pth` de Fase 1 desde Google Drive, pre-carga los 27,000 cubos multiespectrales en RAM (`uint16`) cuando hay memoria disponible y guarda el progreso incremental en `logs/entrega3_resultados.json`.
+* **Comparativa de 3 clasificadores sobre 13 bandas Sentinel-2:**
+  * `ResNet18MultiSpectral`: Red convolucional residual (**CNN Baseline desde cero**) adaptada a entradas `64×64×13`.
+  * `AgroMAEClassifierMLP`: Encoder ViT pre-entrenado + *Global Average Pooling* + **Cabezal MLP** de 2 capas.
+  * `AgroMAEClassifierCNN`: Encoder ViT pre-entrenado cuyos 64 tokens latentes se reorganizan a su grilla espacial 2D `(B, 256, 8, 8)` y pasan por un **Cabezal CNN Espacial 2D residual** para capturar bordes geométricos de ríos, vías y parcelas.
+
+### 2. Curva Completa de Escasez de Etiquetas (Sección 9)
+* Evaluación estratificada bajo **6 regímenes de disponibilidad de etiquetas**: **`1%`, `5%`, `10%`, `25%`, `50%` y `100%`**.
+* Compara cara a cara `ResNet-18 (CNN 13ch)`, `ViT + MLP (Scratch)`, `AgroMAE + MLP (Fine-Tuning)` y `AgroMAE + CNN Espacial (Fine-Tuning)`, además de contrastar **Linear Probing** (*Encoder* congelado) frente a **Fine-Tuning Completo** en `10%` y `100%`.
+
+### 3. Estudio de Ablación del Porcentaje de Enmascaramiento (Sección 10)
+* Compara de forma controlada tasas de ocultación `mask_ratio` de **`50%` vs. `75%` vs. `85%`** midiendo calidad de reconstrucción (`Val MSE`, `Val PSNR`), costo computacional por época y transferencia con el `10%` de etiquetas.
+
+### 4. Diagnóstico por Clase e Importancia de las 13 Bandas Sentinel-2 (Sección 11)
+* **Matriz de Confusión Normalizada (%)** y reporte detallado (`Precision`, `Recall`, `F1-Score`) sobre las **4,050 imágenes de validación** con el modelo campeón al `100%`.
+* **Importancia Espectral por Permutación:** Evalúa la caída de exactitud al permutar cada banda individual, demostrando cuantitativamente el aporte del **Red-Edge (`B05–B07`)**, **Infrarrojo Cercano (`B08`/`B8A`)** y **SWIR (`B11`/`B12`)** frente al espectro visible RGB.
+
+### 5. Verificación Geoespacial Global — *"¿Qué es este lugar?"* (Secciones 12 y 13)
+* **Motor STAC sin credenciales:** Conecta con **Element 84 Earth Search (`sentinel-2-c1-l2a`)** y **Microsoft Planetary Computer (`sentinel-2-l2a`)** para descargar ventanas reales de $640\text{ m}\times 640\text{ m}$ (`64×64` px) libres de nubes (filtro automático con máscara `SCL`), aplicando calibración radiométrica `Baseline 04.00+` y alineamiento Rayleigh L2A$\\rightarrow$TOA.
+* **Lugares evaluados en Colombia 🇨🇴 y el Mundo 🌍:**
+  * 🇨🇴 Amazonia (Tarapacá, Amazonas), Valle del Cauca (Palmira), Bucaramanga (Santander) y Lago de Tota (Boyacá).
+  * 🌍 Central Valley (California, EE. UU.), Olivares de Jaén (España), Puerto de Róterdam (Países Bajos) y Tokio Urbano (Japón).
+* **Diagnóstico completo por coordenada:** Muestra reconstrucción MAE al 75% (`PSNR dB` + RGB + Falso Color NIR `8-4-3`), predicción Top-3 con consenso entre `AgroMAE-CNN`, `AgroMAE-MLP` y `ResNet-18`, y verificación física mediante **`NDVI`**, **`NDWI`** y **`NDBI`**.
+* **Laboratorio Interactivo (`Sección 13`):** Formulario `@param` en Colab para consultar cualquier par `(LATITUD, LONGITUD)` del planeta en tiempo real.
+
+## Tecnologías y librerías añadidas
+* `pystac-client` y `planetary-computer` (consulta STAC abierta de Sentinel-2)
+* `pyproj` y `rasterio` (reproyección UTM y recorte geográfico de ventanas `640×640 m`)
+* `scikit-learn` (partición estratificada, métricas macro y matrices de confusión)
+
+## Gráficas generadas en `logs/` al ejecutar la Tercera Entrega
+* `logs/entrega3_curva_escasez_completa.png` — Curva `1% → 100%` (`Accuracy` y `F1-Macro`).
+* `logs/entrega3_ablacion_mask_ratio.png` — Ablación `50%` vs. `75%` vs. `85%`.
+* `logs/entrega3_matriz_confusion_y_f1.png` — Matriz de confusión al `100%` y F1 por clase.
+* `logs/entrega3_importancia_13_bandas.png` — Aporte de cada banda espectral de Sentinel-2.
+
+## Cómo ejecutar rápidamente la Tercera Entrega en Colab
+1. Abre [`AgroMAE_Entrenamiento_Colab.ipynb`](https://colab.research.google.com/github/Afav22-lab/AgroMAE-Project/blob/main/AgroMAE_Entrenamiento_Colab.ipynb) en Google Colab con **GPU L4** (o T4) y **RAM amplia**.
+2. Ejecuta únicamente las **Secciones 1, 2, 3 y 4** *(montar Google Drive, cargar EuroSAT e instanciar `AgroMAE`)*.
+3. Salta el bucle de entrenamiento de la Sección 5 y ejecuta directamente las **Secciones 8 a 13**, que cargan automáticamente tu `checkpoint_best.pth` guardado en Drive.
