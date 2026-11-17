@@ -136,6 +136,7 @@ Proyecto académico de aprendizaje profundo y procesamiento de imágenes multies
 
 ## Presentaciones
 * **Entrega 1 y 2 (Canva):** [docs/Entrega_1_y_2.pdf](docs/Entrega_1_y_2.pdf)
+* **Entrega Final (Google Slides):** [entrega final/AgroMAE_Entrega_Final.pdf](entrega%20final/AgroMAE_Entrega_Final.pdf)
 
 ---
 
