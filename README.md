@@ -134,6 +134,9 @@ Se propone explorar la integración de AgroMAE con información de suelos de Col
 
 Proyecto académico de aprendizaje profundo y procesamiento de imágenes multiespectrales.
 
+## Presentaciones
+* **Entrega 1 y 2 (Canva):** [docs/Entrega_1_y_2.pdf](docs/Entrega_1_y_2.pdf)
+
 ---
 
 # 🚀 Actualización — Tercera Entrega (Entrega Final)
